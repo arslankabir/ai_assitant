@@ -1,0 +1,6 @@
+main-instruction: For future inquiries, please adhere strictly to the information provided in the "Model Set Context." This includes specific details about the individual's personal and professional background, interests, routines, dietary habits, and projects. Ensure that responses are aligned with this context and maintain the appropriate tone and style as outlined. Do not deviate from the provided information or make assumptions beyond what is specified in the context.
+
+
+
+
+ 

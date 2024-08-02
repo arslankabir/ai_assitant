@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Modern Chat Interface</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #000;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: #fff;
+        }
+        .chat-container {
+            width: 40%;
+            background-color: #333;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 70%;
+        }
+        .response-container {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            border-bottom: 1px solid #444;
+            color: #fff;
+        }
+        .input-container {
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            background-color: #444;
+        }
+        .input-container input[type="text"] {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #555;
+            border-radius: 25px;
+            outline: none;
+            font-size: 16px;
+            color: #fff;
+            background-color: #555;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .input-container input[type="button"] {
+            padding: 10px 20px;
+            margin-left: 10px;
+            border: none;
+            background-color: #007bff;
+            color: #fff;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        .input-container input[type="button"]:hover {
+            background-color: #0056b3;
+        }
+        .message {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 15px;
+            max-width: 80%;
+            font-size: 16px;
+            line-height: 1.4;
+        }
+        .message.user {
+            background-color: #007bff;
+            color: #fff;
+            align-self: flex-end;
+        }
+        .message.bot {
+            background-color: #444;
+            color: #fff;
+            align-self: flex-start;
+        }
+    </style>
+</head>
+<body>
+
+<div class="chat-container">
+    <div class="response-container" id="response-container">
+        <!-- Responses will appear here -->
+    </div>
+    <div class="input-container">
+        <input type="text" id="user-input" placeholder="Type your message here...">
+        <input type="button" value="Send" onclick="sendMessage()">
+    </div>
+</div>
+
+<script>
+    function sendMessage() {
+        var userInput = document.getElementById('user-input').value;
+        if (userInput.trim() === '') return;
+
+        var responseContainer = document.getElementById('response-container');
+
+        // Create a new div element for user message
+        var userMessageDiv = document.createElement('div');
+        userMessageDiv.className = 'message user';
+        userMessageDiv.textContent = userInput;
+
+        // Append user message to response container
+        responseContainer.appendChild(userMessageDiv);
+
+        // Clear the input field
+        document.getElementById('user-input').value = '';
+
+        // Simulate bot thinking effect
+        var botMessageDiv = document.createElement('div');
+        botMessageDiv.className = 'message bot';
+        botMessageDiv.textContent = 'Thinking... stay tuned';
+        responseContainer.appendChild(botMessageDiv);
+        responseContainer.scrollTop = responseContainer.scrollHeight;
+
+        fetch('/send_message/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: JSON.stringify({ message: userInput })
+        })
+        .then(response => response.json())
+        .then(data => {
+            botMessageDiv.textContent = ''; // Clear the 'thinking' text
+            typeResponse(botMessageDiv, "Liberte-AI-v2.o3: " + data.response);
+        });
+    }
+
+    function typeResponse(element, text) {
+        let index = 0;
+        function type() {
+            if (index < text.length) {
+                element.textContent += text.charAt(index);
+                index++;
+                setTimeout(type, 50); // Adjust typing speed here
+            }
+        }
+        type();
+    }
+
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+</script>
+
+</body>
+</html>
